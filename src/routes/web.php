@@ -18,4 +18,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/track/js', [TrackController::class, 'js']);
+//Route::get('/track/js', [TrackController::class, 'js']);
+Route::post('/track/js', [TrackController::class, 'js']);

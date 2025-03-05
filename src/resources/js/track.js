@@ -3,65 +3,48 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs'
 const fpPromise = FingerprintJS.load()
 var visitorId = null
 
-;(async () => {
-    const fp = await fpPromise
-    visitorId = await fp.get()
-})()
+fpPromise
+    .then(fp => fp.get())
+    .then(result => visitorId = result.visitorId)
 
 class Queue {
     constructor(name = "queue") {
         this.name = name
         this.elements = []
-        this.load()
     }
     enqueue(element) {
         this.elements.push(element)
-        this.save()
     }
     dequeue(plength = 1) {
         const items = this.elements.splice(0, plength)
-        this.save()
         return items
     }
     peek(plength = 1) {
         return this.elements.slice(0, plength)
     }
 
-    save() {
-        localStorage.setItem(this.name, JSON.stringify(this.elements))
-    }
-
-    load() {
-        let elements = localStorage.getItem(this.name)
-        if (elements) {
-            this.elements = JSON.parse(elements)
-        } else {
-            this.elements = []
-        }
-    }
-
     clear() {
         this.elements = []
-        this.save()
     }
 
     get length() {
         return this.elements.length
     }
     get isEmpty() {
-        return this.length === 0
+        return this.elements.length === 0
     }
 }
 
 class TrackEvents {
 
-    queue = {}
-    thread = {}
+    queue = null
+    thread = null
     options = {
-        packageLength: 1000,
+        packageLength: 17,
         rangeTimeQueue: 1000,
-        deltaTime: 50,
-        apiUrl: "https://stat.vloc/api/send",
+        deltaTime: 500,
+        apiUrl: import.meta.env.VITE_APP_URL_API,
+        el: document.querySelector("body"),
         events: [
             "blur",
             "click",
@@ -86,8 +69,9 @@ class TrackEvents {
     }
     lastTimestamp = Date.now()
 
-    constructor(el) {
+    constructor() {
         this.init()
+        const el = this.options.el
         this.addEvent(el)
         for (const node of el.querySelectorAll('*')) {
             this.addEvent(node)
@@ -106,26 +90,17 @@ class TrackEvents {
 
         this.initQueue()
 
-        this.thread.first = setInterval(this.threadFirst.bind(this), this.options.rangeTimeQueue)
-        setTimeout(() => this.thread.second = setInterval(this.threadSecond.bind(this), this.options.rangeTimeQueue), Math.round(this.options.rangeTimeQueue / 2))
+        this.thread = setInterval(this.send.bind(this), this.options.rangeTimeQueue)
     }
 
     initQueue() {
-        this.queue.first = new Queue("track_event_first")
-        this.queue.second = new Queue("track_event_second")
-
-        while (!this.queue.first.isEmpty) {
-            this.queue.second.enqueue(this.queue.first.dequeue())
-        }
-        this.queue.first.clear()
+        this.queue = new Queue("track_event")
     }
 
-    threadFirst() {
-        if (this.queue.first.isEmpty) {
-            this.queue.first.clear()
-        } else {
+    send() {
+        if (!this.queue.isEmpty) {
             const pLength = this.options.packageLength
-            const packet = this.queue.first.peek(pLength)
+            const packet = this.queue.peek(pLength)
             fetch(this.options.apiUrl, {
                 method: "POST",
                 body: JSON.stringify(packet),
@@ -135,30 +110,7 @@ class TrackEvents {
             })
                 .then((response) => {
                     if (response.ok) {
-                        this.queue.first.dequeue(pLength)
-                    }
-                })
-                .catch((err) => {
-                })
-        }
-    }
-
-    threadSecond() {
-        if (this.queue.second.isEmpty) {
-            this.queue.second.clear()
-        } else {
-            const pLength = this.options.packageLength
-            const packet = this.queue.second.peek(pLength)
-            fetch(this.options.apiUrl, {
-                method: "POST",
-                body: JSON.stringify(packet),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-                .then((response) => {
-                    if (response.ok) {
-                        this.queue.second.dequeue(pLength)
+                        this.queue.dequeue(pLength)
                     }
                 })
                 .catch((err) => {
@@ -169,24 +121,24 @@ class TrackEvents {
     handleEvent(event) {
         event.stopPropagation()
         if (this.isApplyTimeEvent(event) && !this.isTimeUp()) return
-        this.queue.first.enqueue(this.formData(event))
+        this.queue.enqueue(this.formData(event))
     }
 
     formData(event) {
         return {
-            host: location.hostname,
-            href: location.href,
-            visitorId,
-            type: event.type,
-            time: Date.now(),
-            xpath: this.getXPath(event.target),
-            targetId: event.target.id,
-            mouse: this.getRect(event),
-            browser: {
-                width: document.documentElement.clientWidth,
-                height:document.documentElement.clientHeight
+            ht: location.hostname,
+            hf: location.href,
+            vi: visitorId,
+            tp: event.type,
+            tm: Date.now(),
+            xp: this.getXPath(event.target),
+            ti: event.target.id,
+            ms: this.getRect(event),
+            br: {
+                w: document.documentElement.clientWidth,
+                h:document.documentElement.clientHeight
             },
-            data: this.getData(event)
+            dt: this.getData(event)
         }
     }
 
@@ -216,36 +168,38 @@ class TrackEvents {
 
     getData(event) {
         let data = {
-            page: {
-                width: document.documentElement.scrollWidth,
-                height: document.documentElement.scrollHeight
+            pg: {
+                w: document.documentElement.scrollWidth,
+                h: document.documentElement.scrollHeight
             },
-            mouse: {
-                offsetX: event.offsetX || 0,
-                offsetY: event.offsetY || 0,
-                screenX: event.screenX || 0,
-                screenY: event.screenY || 0
+            ms: {
+                ox: event.offsetX || 0,
+                oy: event.offsetY || 0,
+                sx: event.screenX || 0,
+                sy: event.screenY || 0
             }
         }
         switch (event.type) {
             case "paste":
-                data.content = (event.clipboardData || window.clipboardData).getData("text")
+                data.c = (event.clipboardData || window.clipboardData).getData("text")
                 break
             case "change":
-                data.input.value = event.target.value
+                data.in = {
+                    v: event.target.value
+                }
                 break
             case "keydown":
             case "keypress":
             case "keyup":
-                data.keycode = {
-                    key: event.key,
-                    code: event.code
+                data.kc = {
+                    k: event.key,
+                    c: event.code
                 }
                 break
             case "scroll":
-                data.scroll = {
-                    scrollTop: event.target.scrollTop,
-                    scrollLeft: event.target.scrollLeft
+                data.sl = {
+                    st: event.target.scrollTop,
+                    sl: event.target.scrollLeft
                 }
                 break
             case "wheel":
@@ -291,4 +245,4 @@ class TrackEvents {
     }
 }
 
-new TrackEvents(document.querySelector("body"))
+new TrackEvents()
