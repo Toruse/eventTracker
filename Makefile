@@ -8,13 +8,13 @@ docker-build: memory
 	docker-compose up --build -d
 
 assets-install:
-	docker-compose exec node yarn install
+	docker-compose exec node npm install
 
-assets-rebuild:
-	docker-compose exec node npm rebuild node-sass --force
+assets-build:
+	docker-compose exec node npm run build
 
 assets-dev:
-	docker-compose exec node yarn run dev
+	docker-compose exec node npm run dev
 
 assets-watch:
-	docker-compose exec node yarn run watch
+	docker-compose exec node npm run watch
