@@ -17,6 +17,3 @@ use App\Http\Controllers\TrackController;
 Route::get('/', function () {
     return view('welcome');
 });
-
-//Route::get('/track/js', [TrackController::class, 'js']);
-Route::post('/track/js', [TrackController::class, 'js']);
