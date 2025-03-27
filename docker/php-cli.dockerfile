@@ -6,7 +6,7 @@ RUN pecl install -o -f redis \
 
 RUN apt-get update && apt-get install -y libpq-dev unzip \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
-    && docker-php-ext-install pdo_pgsql
+    && docker-php-ext-install pdo_pgsql pcntl
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/bin --filename=composer --quiet
 

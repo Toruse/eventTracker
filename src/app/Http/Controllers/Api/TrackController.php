@@ -29,6 +29,6 @@ class TrackController extends Controller
             TrackQueueJob::dispatch($result);
         }
 
-        return response()->json(['status' => 'ok', 'data' => $result]);
+        return response()->json(['status' => 'ok']);
     }
 }

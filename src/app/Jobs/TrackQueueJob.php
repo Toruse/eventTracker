@@ -27,6 +27,7 @@ class TrackQueueJob implements ShouldQueue
      */
     public function handle(): void
     {
+        var_dump($this->data);
         echo 'test12';
     }
 }
