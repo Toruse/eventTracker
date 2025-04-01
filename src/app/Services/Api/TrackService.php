@@ -4,9 +4,10 @@ namespace App\Services\Api;
 
 class TrackService
 {
-    public $validationOnly = ['ht', 'hf', 'vi', 'tp', 'tm', 'xp', 'ti', 'ms', 'br', 'dt'];
+    public $validationOnly = ['id', 'ht', 'hf', 'vi', 'tp', 'tm', 'xp', 'ti', 'ms', 'br', 'dt'];
 
     public $validationRules = [
+        'id' => 'nullable|string|max:128',
         'ht' => 'nullable|string|max:256',
         'hf' => 'nullable|url',
         'vi' => 'nullable|string|max:256',

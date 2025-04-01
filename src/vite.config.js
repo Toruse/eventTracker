@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import vue from '@vitejs/plugin-vue';
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import path from 'path'
 
@@ -10,8 +11,16 @@ const filesWithoutHash = [
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js', 'resources/js/track.js'],
+            input: ['resources/js/app.js', 'resources/js/track.js'],
             refresh: true,
+        }),
+        vue({
+            template: {
+                transformAssetUrls: {
+                    base: null,
+                    includeAbsolute: false,
+                },
+            },
         }),
         viteStaticCopy({
             targets: [
@@ -22,6 +31,16 @@ export default defineConfig({
             ]
         })
     ],
+    server: {
+        https: false,
+        host: true,
+        strictPort: true,
+        port: 3009,
+        hmr: {host: 'localhost', protocol: 'ws'},
+        watch: {
+            usePolling:true,
+        }
+    },
     build: {
         rollupOptions: {
             output: {

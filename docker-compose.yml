@@ -18,7 +18,7 @@ services:
         volumes:
             - ./src/:/var/www/event-tracker
         depends_on:
-#            - mysql
+            - mysql
             - redis
         environment:
 #            - "DB_PORT=3306"
@@ -34,7 +34,7 @@ services:
         volumes:
             - ./src/:/var/www/event-tracker
         depends_on:
-#            - mysql
+            - mysql
             - redis
 #        environment:
 #            - "DB_PORT=3306"
@@ -44,11 +44,39 @@ services:
         tty: true
         networks:
             - app_network
+    mysql:
+        image: mysql:latest
+        volumes:
+            - ./mysql:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: "root"
+            MYSQL_USER: "app"
+            MYSQL_PASSWORD: "app"
+            MYSQL_DATABASE: "eventtracker"
+        ports:
+            - "33061:3306"
+        networks:
+            - app_network
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        restart: always
+        depends_on:
+            - mysql
+        environment:
+            PMA_HOST: mysql
+            PMA_PORT: 3306
+            MYSQL_ROOT_PASSWORD: "root"
+        ports:
+            - "8090:80"
+        networks:
+            - app_network
     node:
         image: node:alpine
         volumes:
             - ./src/:/var/www/event-tracker
         working_dir: /var/www/event-tracker
+        ports:
+            - "3009:3009"
         tty: true
     redis:
         image: redis:latest

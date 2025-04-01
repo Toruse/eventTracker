@@ -40,6 +40,7 @@ class TrackEvents {
     queue = null
     thread = null
     options = {
+        id: '',
         packageLength: 17,
         rangeTimeQueue: 1000,
         deltaTime: 500,
@@ -126,6 +127,7 @@ class TrackEvents {
 
     formData(event) {
         return {
+            id: this.options.id,
             ht: location.hostname,
             hf: location.href,
             vi: visitorId,

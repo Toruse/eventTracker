@@ -2,4 +2,5 @@
 /.vscode
 /docker/nginx/ssl/
 /redis/
+/mysql/
 /src/composer.lock

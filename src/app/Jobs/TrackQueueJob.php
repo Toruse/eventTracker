@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Services\Job\Tracker\TrackService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -13,12 +14,14 @@ class TrackQueueJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $data;
+    protected $trackService;
 
     /**
      * Create a new job instance.
      */
     public function __construct($data)
     {
+        $this->trackService = new TrackService();
         $this->data = $data;
     }
 
@@ -27,7 +30,10 @@ class TrackQueueJob implements ShouldQueue
      */
     public function handle(): void
     {
-        var_dump($this->data);
-        echo 'test12';
+        if ($this->trackService->saveEvent($this->data)) {
+            echo $this->data['id'] . ' ' . $this->data['tm'] . ' Ok';
+        } else {
+            echo $this->data['id'] . ' ' . $this->data['tm'] . ' Error';
+        }
     }
 }
