@@ -2,15 +2,18 @@
 
 namespace App\Services\Api;
 
+use hisorange\BrowserDetect\Parser as Browser;
+
 class TrackService
 {
-    public $validationOnly = ['id', 'ht', 'hf', 'vi', 'tp', 'tm', 'xp', 'ti', 'ms', 'br', 'dt'];
+    public $validationOnly = ['id', 'ht', 'hf', 'vi', 'si', 'tp', 'tm', 'xp', 'ti', 'ms', 'br', 'dt'];
 
     public $validationRules = [
         'id' => 'nullable|string|max:128',
         'ht' => 'nullable|string|max:256',
         'hf' => 'nullable|url',
         'vi' => 'nullable|string|max:256',
+        'si' => 'nullable|string|max:128',
         'tp' => 'nullable|string|in:blur,click,contextmenu,change,copy,cut,dblclick,focus,keyup,mouseenter,mouseleave,mousemove,paste,wheel,dragenter,dragleave,dragstart,dragend,drop',
         'tm' => 'nullable|integer',
         'xp' => 'nullable|string',
@@ -40,4 +43,19 @@ class TrackService
         'dt.sl.st' => 'nullable|integer',
         'dt.sl.sl' => 'nullable|integer',
     ];
+
+    public function getVisitorInfo() {
+        return [
+            'locale' => \Locale::acceptFromHttp(request()->server('HTTP_ACCEPT_LANGUAGE')),
+            'ip_address' => request()->ip(),
+            'browser_type' => Browser::deviceType(),
+            'browser_family' => Browser::browserFamily(),
+            'browser_version' => Browser::browserVersion(),
+            'browser_engine' => Browser::browserEngine(),
+            'platform_family' => Browser::platformFamily(),
+            'platform_version' => Browser::platformVersion(),
+            'device_family' => Browser::deviceFamily(),
+            'device_model' => Browser::deviceModel()
+        ];
+    }
 }

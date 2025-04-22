@@ -6,10 +6,10 @@ use App\Models\Tracker\Visitor;
 
 class VisitorRepository
 {
-    public function get($visitor_id)
+    public function getOrCreate($visitor_id, array $attributes)
     {
         return Visitor::firstOrCreate([
             'code' => $visitor_id
-        ]);
+        ], $attributes);
     }
 }

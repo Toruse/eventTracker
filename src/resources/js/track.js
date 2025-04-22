@@ -46,6 +46,7 @@ class TrackEvents {
         deltaTime: 500,
         apiUrl: import.meta.env.VITE_APP_URL_API,
         el: document.querySelector("body"),
+        sessionId: '',
         events: [
             "blur",
             "click",
@@ -69,6 +70,7 @@ class TrackEvents {
         ]
     }
     lastTimestamp = Date.now()
+    storageSessionName = 'eventtrackersession'
 
     constructor() {
         this.init()
@@ -85,9 +87,13 @@ class TrackEvents {
         }
     }
     init() {
+        this.options.sessionId = this.getSessionId()
+
         if (typeof trackEventConfig !== "undefined") {
             this.options = {...this.options, ...trackEventConfig}
         }
+
+        window.addEventListener("beforeunload", this.removeSessionId.bind(this), false);
 
         this.initQueue()
 
@@ -117,6 +123,7 @@ class TrackEvents {
                 .catch((err) => {
                 })
         }
+        localStorage.setItem(this.storageSessionName, this.options.sessionId)
     }
 
     handleEvent(event) {
@@ -131,6 +138,7 @@ class TrackEvents {
             ht: location.hostname,
             hf: location.href,
             vi: visitorId,
+            si: this.options.sessionId,
             tp: event.type,
             tm: Date.now(),
             xp: this.getXPath(event.target),
@@ -244,6 +252,21 @@ class TrackEvents {
             nodeElem = nodeElem.parentNode;
         }
         return parts.length ? "/" + parts.reverse().join( "/" ) : "";
+    }
+
+    getSessionId() {
+        let sessionId = localStorage.getItem(this.storageSessionName)
+        if (!sessionId) {
+            sessionId = Date.now().toString(36)
+                + Math.random().toString(36).substr(2)
+                + Math.random().toString(36).substr(2)
+            localStorage.setItem(this.storageSessionName, sessionId)
+        }
+        return sessionId
+    }
+
+    removeSessionId(event) {
+        localStorage.removeItem(this.storageSessionName)
     }
 }
 

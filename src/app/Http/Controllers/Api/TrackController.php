@@ -18,6 +18,9 @@ class TrackController extends Controller
         if (!is_array($data)) {
             return response()->json(['status' => 'error']);
         }
+
+        $visitorInfo = $this->trackService->getVisitorInfo();
+
         $result = [];
         foreach ($data as $event) {
             $validator = Validator::make($event, $this->trackService->validationRules);
@@ -25,6 +28,8 @@ class TrackController extends Controller
             if ($validator->fails()) continue;
 
             $result = $validator->safe()->only($this->trackService->validationOnly);
+
+            $result['sr'] = $visitorInfo;
 
             TrackQueueJob::dispatch($result);
         }

@@ -13,6 +13,7 @@ class Tracker extends Model
         'hostname',
         'href',
         'event_id',
+        'session_name',
         'resource_id',
         'visitor_id',
         'time_event',

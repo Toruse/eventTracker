@@ -34,7 +34,7 @@ class TrackService {
 
         $visitorId = null;
         if ($data['vi']) {
-            $visitor = $this->visitorRepository->get($data['vi']);
+            $visitor = $this->visitorRepository->getOrCreate($data['vi'], $data['sr']);
             $visitorId = $visitor->id;
         }
         $data['vi'] = $visitorId;
@@ -57,6 +57,7 @@ class TrackService {
             'hostname' => $data['ht'],
             'href' => $data['hf'],
             'event_id' => $data['tp'],
+            'session_name' => $data['si'],
             'resource_id' => $data['id'],
             'visitor_id' => $data['vi'],
             'time_event' => $data['tm'],
