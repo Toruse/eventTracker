@@ -20,21 +20,21 @@ import {
 import {Link, useForm, usePage} from "@inertiajs/vue3";
 import {ref, watch} from "vue";
 
-defineProps({
-    resources: {
-        type: Object
-    }
+const props = defineProps({
+    resources: Object,
+    selectedResource: Object
 });
 
-const res = usePage().props.resources
-let selected = ref(res.data[0])
+const emit = defineEmits(["update:modelValue"]);
+
+let selected = ref(props.selectedResource.data)
 
 watch(
     () => usePage().props.resources,
     (val) => {
         selected = ref(val.data[0])
     }
-);
+)
 
 const deleteForm = useForm({})
 const deleteResource = () => {
@@ -51,7 +51,7 @@ const deleteResource = () => {
     <div class="lg:flex lg:items-center lg:justify-between">
         <div class="min-w-0 flex-1">
             <div class="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                <Listbox as="div" v-model="selected" v-if="selected">
+                <Listbox as="div" v-model="selected" v-if="selected" @update:modelValue="value => emit('update:modelValue', value)">
                     <div class="relative">
                         <ListboxButton class="grid cursor-default grid-cols-1 rounded-md bg-white py-1.5 pr-2 pl-3 text-left text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 text-xl">
                                 <span class="col-start-1 row-start-1 flex items-center gap-3 pr-6">
@@ -69,8 +69,8 @@ const deleteResource = () => {
                                     </div>
 
                                     <span v-if="selected" :class="[active ? 'text-white' : 'text-indigo-600', 'absolute inset-y-0 right-0 flex items-center pr-4']">
-                                            <CheckIcon class="size-5" aria-hidden="true" />
-                                          </span>
+                                        <CheckIcon class="size-5" aria-hidden="true" />
+                                    </span>
                                 </li>
                             </ListboxOption>
                         </ListboxOptions>

@@ -6,9 +6,13 @@ use App\Models\Tracker\Visitor;
 
 class VisitorRepository
 {
-    public function getOrCreate($visitor_id, array $attributes)
+    public function existsCode($visitorId) {
+        return Visitor::where('code', $visitorId)->exists();
+    }
+
+    public function updateOrCreate($visitor_id, array $attributes)
     {
-        return Visitor::firstOrCreate([
+        return Visitor::updateOrCreate([
             'code' => $visitor_id
         ], $attributes);
     }

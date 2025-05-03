@@ -27,9 +27,11 @@ class ResourceController extends Controller
      */
     public function store(CreateRequest $request)
     {
-        $this->resourceService->create($request->only(['domain']));
+        $resource = $this->resourceService->create($request->only(['domain']));
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard', [
+            'selectedResource' => $resource->id
+        ]);
     }
 
     /**
@@ -53,7 +55,9 @@ class ResourceController extends Controller
 
         $this->resourceService->update($resource, $request->only(['domain']));
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard', [
+            'selectedResource' => $resource->id
+        ]);
     }
 
     /**

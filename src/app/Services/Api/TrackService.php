@@ -45,6 +45,7 @@ class TrackService
     ];
 
     public function getVisitorInfo() {
+        $geoIPData = geoip(request()->ip());
         return [
             'locale' => \Locale::acceptFromHttp(request()->server('HTTP_ACCEPT_LANGUAGE')),
             'ip_address' => request()->ip(),
@@ -55,7 +56,14 @@ class TrackService
             'platform_family' => Browser::platformFamily(),
             'platform_version' => Browser::platformVersion(),
             'device_family' => Browser::deviceFamily(),
-            'device_model' => Browser::deviceModel()
+            'device_model' => Browser::deviceModel(),
+            'city' => $geoIPData->city,
+            'continent' => $geoIPData->continent,
+            'country' => $geoIPData->country,
+            'currency' => $geoIPData->currency,
+            'iso_code' => $geoIPData->iso_code,
+            'postal_code' => $geoIPData->postal_code,
+            'timezone' => $geoIPData->timezone
         ];
     }
 }

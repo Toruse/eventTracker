@@ -27,7 +27,7 @@ class ResourceService
             $code = $this->genCode();
         }
 
-        $this->resourceRepository->create([
+        return $this->resourceRepository->create([
             'code' => $code,
             'domain' => $request['domain'],
             'user_id' => Auth::user()->id

@@ -53,7 +53,7 @@ const submitEdit = () => {
                         </div>
 
                         <div class="mt-6 flex items-center justify-end gap-x-6">
-                            <Link :href="route('dashboard')" class="text-sm/6 font-semibold text-gray-900">Cancel</Link>
+                            <Link :href="route('dashboard', {'selectedResource': resource.data.id})" class="text-sm/6 font-semibold text-gray-900">Cancel</Link>
                             <PrimaryButton :disabled="form.processing">Update</PrimaryButton>
 
                             <Transition

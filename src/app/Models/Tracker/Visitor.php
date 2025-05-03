@@ -20,7 +20,14 @@ class Visitor extends Model
         'platform_family',
         'platform_version',
         'device_family',
-        'device_model'
+        'device_model',
+        'city',
+        'continent',
+        'country',
+        'currency',
+        'iso_code',
+        'postal_code',
+        'timezone'
     ];
 
 }

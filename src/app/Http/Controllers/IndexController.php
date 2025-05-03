@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Tracker\Index\DashboardRequest;
 use App\Http\Resources\Tracker\Resource\IndexSelect;
 use App\Services\Tracker\ResourceService;
 use Illuminate\Foundation\Application;
@@ -25,10 +26,17 @@ class IndexController
         ]);
     }
 
-    public function dashboard()
+    public function dashboard(DashboardRequest $request)
     {
+        $selectedResourceId = $request->input('selectedResource');
+
+        $resources = $this->resourceService->listToSelect();
+        $selectedResource = $selectedResourceId ? $resources->firstWhere('id', $selectedResourceId) : $resources->first();
+
         return Inertia::render('Index/Dashboard', [
-            'resources' => IndexSelect::collection($this->resourceService->listToSelect())
+            'resources' => IndexSelect::collection($resources),
+            'selectedResource' => new IndexSelect($selectedResource),
+            'selectedTab' => $request->input('selectedTab', 0)
         ]);
     }
 }
